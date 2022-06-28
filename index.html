@@ -1,33 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script
-    src="https://code.jquery.com/jquery-3.6.0.js"
-    integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-    crossorigin="anonymous"></script>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="css/style.min.css">
+    <link rel="stylesheet" href="css/icon.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="js/lib/fabric.min.js"></script>
-    <script type="text/javascript"  src="js/lib/FileSaver.js"></script>
-    <script type="text/javascript"  src="js/lib/canvas-toBlob.js"></script>
+    <script type="text/javascript" src="js/lib/FileSaver.js"></script>
+    <script type="text/javascript" src="js/lib/canvas-toBlob.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Kotta+One&family=Noto+Serif+JP:wght@500&family=Quintessential&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kotta+One&family=Noto+Serif+JP:wght@500&family=Quintessential&display=swap"
+        rel="stylesheet">
     <style>
-        #canvas{
-	        display: block;
+        #appName {
+            font-size: 20px;
+            font-weight: 600;
+            display: inline-block;
+            color: #666;
+            font-style: italic;
+            /* padding: 1rem 2rem;
+            color: #fff;
+            background-image: -webkit-gradient(linear, left top, right top, from(#fa709a), to(#fee140));
+            background-image: -webkit-linear-gradient(left, #fa709a 0%, #fee140 100%);
+            background-image: linear-gradient(to right, #fa709a 0%, #fee140 100%); */
         }
+
+        #canvas {
+            display: block;
+        }
+
         #meta-wrapper {
             margin-left: auto;
             margin-right: auto;
         }
+
         #wrapper {
             width: 100%;
-            height: 100%;
+            /*height: 100%;*/
+            height: 750px;
+            overflow: scroll;
         }
+
+        button {
+            appearance: none;
+            border: 0;
+            border-radius: 5px;
+            background: #ddd;
+            /*background: #4676D7;*/
+            color: #333;
+            /*color: #fff;*/
+            margin: 4px;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button.download {
+            background: #4676D7;
+            color: #fff;
+        }
+
+        .setting-label {
+            display: inline-block;
+        }
+
+        #current-color-fontColor,
+        #current-color-bgColor {
+            width: 80px;
+        }
+
+        .op-area-wrapper {
+            padding: 8px;
+            margin: 0 16px;
+            margin-bottom: 8px;
+            border-bottom: solid 2px #eee;
+        }
+
         .color-preset-changer {
             width: 32px;
             height: 32px;
@@ -36,34 +92,77 @@
             display: inline-block;
         }
     </style>
-    <title>化物語「風」扉絵メーカー v0.5(プロトタイプ)</title>
+    <title>化物語「風」扉絵メーカー v0.80(プロトタイプ)</title>
 </head>
+
 <body>
-    <div style="display: block">
+    <header class="l-header l-header-shadow">
+        <div class="container container-header">
+
+            <!--logo-->
+            <h1 class="siteTitle">
+                <a class="siteTitle__link" href="https://tasokori.net">
+                    <img class="siteTitle__logo"
+                        src="https://tasokori.net/wp/wp-content/uploads/2022/06/tasokori-net-logo.png"
+                        alt="GN125と過ごすSEのブログ" width="628" height="165">
+                </a>
+            </h1>
+            <!--/logo-->
+
+            <span id="appName">化物語「風」扉絵メーカー</span>
+
+            <!--subNavi-->
+            <nav class="subNavi">
+                <ul class="subNavi__list">
+                    <li class="subNavi__item"><a class="subNavi__link icon-twitter"
+                            href="https://twitter.com/hidetaso0222"></a></li>
+                    <li class="subNavi__item"><a class="subNavi__link icon-instagram"
+                            href="http://instagram.com/hidetaso22"></a></li>
+                    <li class="subNavi__item"><a class="subNavi__link icon-youtube"
+                            href="https://www.youtube.com/channel/UCiuiDLTNApBVmqQNloG3NKg"></a></li>
+                    <li class="subNavi__item"><a class="subNavi__link icon-pinterest"
+                            href="https://www.pinterest.jp/hidetaso"></a></li>
+                    <li class="subNavi__item"><a class="subNavi__link icon-rss" href="http://tasokori.net/feed"></a>
+                    </li>
+                </ul>
+            </nav>
+            <!--/subNavi-->
+
+        </div>
+    </header>
+    <div style="display: block; margin: 32px;">
         <div id="meta-wrapper">
             <div id="wrapper">
                 <canvas id="canvas" width="" height=""></canvas>
             </div>
         </div>
 
-        <div id="current-color-wrapper">
-            <span class='setting-label'>FontColor: </span>
-            <input type="text" id="current-color-fontColor">
-            <span class='setting-label'>BackgroundColor: </span>
-            <input type="text" id="current-color-bgColor">
+        <div id="object-controller-wrapper" class="op-area-wrapper">
+            <button id="add-main-text">メインテキストを追加</button>
 
-            <button id="current-color-change-button">Change Color</button>
+            <button id="add-sub-text">サブテキストを追加</button>
+
+            <button id="delete-selected-text">選択しているテキストを削除</button>
         </div>
 
-        <div id="color-preset-wrapper"></div>
+        <div id="current-color-wrapper" class="op-area-wrapper">
+            <span class='setting-label'>フォント色: </span>
+            <input type="text" id="current-color-fontColor">
+            <span class='setting-label'>背景色: </span>
+            <input type="text" id="current-color-bgColor">
 
-        <div id="frame-toggle-wrapper">
-            <div class='setting-label'>Toggle Frame: </div>
+            <button id="current-color-change-button">色を変更</button>
+        </div>
+
+        <div id="color-preset-wrapper" class="op-area-wrapper"></div>
+
+        <div id="frame-toggle-wrapper" class="op-area-wrapper">
+            <div class='setting-label'>フレーム有り/無し: </div>
             <input type="checkbox" id="frame-toggle-check">
         </div>
 
-        <div id="download-image-wrapper">
-            <button id="download-image">Download</button>
+        <div id="download-image-wrapper" class="op-area-wrapper">
+            <button id="download-image" class="download">ダウンロード</button>
         </div>
 
         <input type="hidden" id="current-theme-holder">
@@ -75,11 +174,11 @@
         const elCanvas = document.getElementById("canvas")
         const elWrapper = document.getElementById("wrapper")
 
-        const baseWidth = elWrapper.offsetWidth * 0.8
+        const baseWidth = 1280// elWrapper.offsetWidth * 0.8
         const canvasWidth = baseWidth
         const canvasHeight = baseWidth * 9 / 16
         elCanvas.width = canvasWidth
-        elCanvas.height =  canvasHeight
+        elCanvas.height = canvasHeight
 
         const canvas = new fabric.Canvas("canvas")
 
@@ -97,10 +196,8 @@
             selectable: false,
         })
 
-        const mainText = new fabric.IText("化物語 黒齣", {
+        const MAIN_TEXT_TEMPLATE = {
             fontWeight: 'normal',
-            left: canvasWidth / 2,
-            top: canvasHeight / 2 - 48,
             fontFamily: defaultFontFamily,
             charSpacing: 1000,
             fill: defaultFontColor,
@@ -108,12 +205,10 @@
             originX: "center",
             originY: "center",
             selectable: true,
-        })
+        }
 
-        const subText = new fabric.IText("bakemonogatari                                            kuro", {
+        const SUB_TEXT_TEMPLATE = {
             fontWeight: 'normal',
-            left: canvasWidth / 2,
-            top: canvasHeight / 2 + 24,
             fontFamily: "Kotta One, 'Kotta One', serif",
             fontStyle: 'italic',
             charSpacing: 10,
@@ -122,6 +217,18 @@
             originX: "center",
             originY: "center",
             selectable: true,
+        }
+
+        const mainText = new fabric.IText("化物語 黒齣", {
+            ...MAIN_TEXT_TEMPLATE,
+            left: canvasWidth / 2,
+            top: canvasHeight / 2 - 48
+        })
+
+        const subText = new fabric.IText("bakemonogatari                                            kuro", {
+            ...SUB_TEXT_TEMPLATE,
+            left: canvasWidth / 2,
+            top: canvasHeight / 2 + 24,
         })
 
         const rectangleWrap = new fabric.Rect({
@@ -135,9 +242,9 @@
             strokeWidth: 4,
         })
 
-        const calcFrameColor = color=> $("#frame-toggle-check").prop('checked') ? color : "transparent"
+        const calcFrameColor = color => $("#frame-toggle-check").prop('checked') ? color : "transparent"
 
-        const changeTheme = (bgColor, fontColor)=> {
+        const changeTheme = (bgColor, fontColor) => {
             $("#current-theme-holder").attr("data-attr-bgcolor", bgColor).attr("data-attr-fontcolor", fontColor)
 
             bg.set("fill", bgColor)
@@ -148,12 +255,12 @@
             canvas.renderAll()
         }
 
-        $("#color-preset-wrapper").append("<div class='setting-label'>Select Theme: </div>")
-        const elColorPresetWrapper = COLOR_PRISETS.forEach(v=> {
+        $("#color-preset-wrapper").append("<div class='setting-label'>カラーテーマ: </div>")
+        const elColorPresetWrapper = COLOR_PRISETS.forEach(v => {
             const [bgColor, fontColor] = v.split("/")
-            const el = 
+            const el =
                 $(`<div id='${v}' class='color-preset-changer' style='background-color: ${bgColor}' data-attr-bgcolor='${bgColor}' data-attr-fontcolor='${fontColor}'></div>`)
-                    .on("click", event=> {
+                    .on("click", event => {
                         const bgColor = $(event.target).attr("data-attr-bgcolor")
                         const fontColor = $(event.target).attr("data-attr-fontcolor")
 
@@ -161,25 +268,48 @@
                     })
             $("#color-preset-wrapper").append(el)
         })
-        
-        $("#frame-toggle-check").on("click", event=> {
+
+        $("#frame-toggle-check").on("click", event => {
             const fontColor = $("#current-theme-holder").attr("data-attr-fontcolor")
             rectangleWrap.set("stroke", calcFrameColor(fontColor))
 
             canvas.renderAll()
         })
 
-        $("#current-color-change-button").on("click", event=> {
+        $("#current-color-change-button").on("click", event => {
             const fontColor = $("#current-color-fontColor").val()
             const bgColor = $("#current-color-bgColor").val()
 
             changeTheme(bgColor, fontColor)
         })
 
-        $("#download-image").on("click", ()=> {
-            $("#canvas").get(0).toBlob(function(blob){
-		        saveAs(blob, "monogatari-like-cut.png");
+        $("#download-image").on("click", () => {
+            canvas.discardActiveObject()
+            canvas.renderAll()
+
+            $("#canvas").get(0).toBlob(function (blob) {
+                saveAs(blob, "monogatari-like-cut.png");
             })
+        })
+
+        $("#add-main-text").on("click", () => {
+            canvas.add(new fabric.IText("新規テキスト", {
+                ...MAIN_TEXT_TEMPLATE,
+                left: canvasWidth / 2 + 24,
+                top: canvasHeight / 2 - 48 + 24
+            }))
+        })
+
+        $("#add-sub-text").on("click", () => {
+            canvas.add(new fabric.IText("shinki    text", {
+                ...SUB_TEXT_TEMPLATE,
+                left: canvasWidth / 2 + 24,
+                top: canvasHeight / 2 - 48 + 24
+            }))
+        })
+
+        $("#delete-selected-text").on("click", () => {
+            canvas.remove(canvas.getActiveObject())
         })
 
         canvas.add(bg)
@@ -188,4 +318,5 @@
         canvas.add(subText)
     </script>
 </body>
+
 </html>
